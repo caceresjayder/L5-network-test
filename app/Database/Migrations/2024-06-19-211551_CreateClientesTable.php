@@ -27,15 +27,15 @@ class CreateClientesTable extends Migration
                 "type"=> "VARCHAR",
                 "constraint" => "100"
             ],
-            "create_at" => [
+            "created_at" => [
                 "type" => "timestamp",
                 "default" => new RawSql("CURRENT_TIMESTAMP")
             ],
-            "update_at" => [
+            "updated_at" => [
                 "type" => "timestamp",
                 "default" => new RawSql("CURRENT_TIMESTAMP")
             ],
-            "delete_at" => [
+            "deleted_at" => [
                 "type" => "timestamp",
                 "null" => true
             ],

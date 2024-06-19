@@ -9,8 +9,8 @@ class Pedido extends Model
     protected $table            = 'pedidos';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $returnType       = \App\Models\Pedido::class;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [];
 
@@ -31,8 +31,8 @@ class Pedido extends Model
     protected $validationRules      = [
         "codigo_pedido" => "required|string",
         "cliente_id" => "required|integer",
-        "data_entrega" => "required|date_format:Y-m-d H:i:s",
-        "status" => "required|in:1,2,3"
+        "data_entrega" => "required|date_format[Y-m-d H:i:s]",
+        "status" => "required|in[1,2,3]"
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
