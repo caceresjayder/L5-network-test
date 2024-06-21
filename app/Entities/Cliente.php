@@ -10,7 +10,7 @@ class Cliente extends Entity
         "id" => null,
         "user_id" => null,
         "nome" => null,
-        "cpnj" => null,
+        "cnpj" => null,
         "created_at" => null,
         "updated_at" => null,
         "deleted_at" => null,

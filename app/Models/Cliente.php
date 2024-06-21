@@ -12,7 +12,7 @@ class Cliente extends Model
     protected $returnType       = \App\Models\Cliente::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ["nome", "cnpj"];
+    protected $allowedFields    = ["nome", "cnpj", "user_id"];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -13,8 +13,7 @@ class User extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        "email" => "required|string",
-        "password" => "required|string",
+       "email", "password"
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -42,7 +41,7 @@ class User extends Model
     // Callbacks
     protected $allowCallbacks = true;
     protected $beforeInsert   = [
-        "password" => fn($value) => password_hash($value, PASSWORD_BCRYPT, ["rounds" => 10])
+        "handleInsertData" 
     ];
     protected $afterInsert    = [];
     protected $beforeUpdate   = [];
@@ -51,4 +50,16 @@ class User extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    protected function handleInsertData(array $data)
+    {
+        if(!isset($data["data"]["password"])) {
+            return $data;
+        }
+        
+        $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_BCRYPT, ["rounds" => 10]); 
+        
+        return $data;
+    }
 }
