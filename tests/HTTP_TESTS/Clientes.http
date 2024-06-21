@@ -1,0 +1,11 @@
+### LIST
+
+GET {{$dotenv %BACKEND_URL}}/v1/clientes
+Accept: application/json
+Authorization: Bearer {{$dotenv %JWT_TOKEN}}
+
+### SHOW
+
+GET {{$dotenv %BACKEND_URL}}/v1/clientes/21
+Accept: application/json
+Authorization: Bearer {{$dotenv %JWT_TOKEN}}

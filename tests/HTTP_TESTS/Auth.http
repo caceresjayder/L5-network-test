@@ -1,0 +1,33 @@
+
+### REGISTER
+
+POST {{$dotenv %BACKEND_URL}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+    "parametros" : {
+        "nome" : "Lucas Silva",
+        "email" : "silva10@example.com",
+        "password" : "silva@123",
+        "cnpj" : "5555555555555"
+    }
+}
+
+### LOGIN
+POST {{$dotenv %BACKEND_URL}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "parametros" : {
+        "email" : "silva9@example.com",
+        "password" : "silva@123"
+    }
+}
+
+### USER INFO
+
+GET {{$dotenv %BACKEND_URL}}/auth/user-info
+Accept: application/json
+Authorization: Bearer {{$dotenv %JWT_TOKEN}}
