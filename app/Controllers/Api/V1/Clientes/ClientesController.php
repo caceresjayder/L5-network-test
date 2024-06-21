@@ -151,8 +151,8 @@ class ClientesController extends BaseController
     {
         $rules = 
         [
-            'nome'=> 'if_exist|string',
-            'cnpj' => 'if_exist|string'
+            'parametros.nome'=> 'if_exist|string',
+            'parametros.cnpj' => 'if_exist|string'
         ];
 
         try
