@@ -5,6 +5,7 @@ namespace App\Controllers\Api\V1\Produtos;
 use App\Controllers\BaseController;
 use App\Helpers\MapResponse;
 use App\Helpers\Paginator;
+use CodeIgniter\Database\MySQLi\Builder;
 use CodeIgniter\HTTP\Response;
 use Exception;
 
@@ -32,7 +33,6 @@ class ProdutosController extends BaseController
                         )
                     );
             }
-            ;
 
             $params = $this->validator->getValidated();
             $filter_valor = $params["parametros"]["filter_valor"] ?? null;
@@ -43,18 +43,15 @@ class ProdutosController extends BaseController
             $limit = 15;
 
             $produtoModel = new \App\Models\Produto();
-            if ($filter_valor)
-                $produtoModel->like("valor", $filter_valor);
-            if ($filter_nome)
-                $produtoModel->like("nome", $filter_nome);
-            if ($filter_stock)
-                $produtoModel->like("stock", $filter_stock);
-            if ($filter_categoria)
-                $produtoModel->like("categoria", $filter_categoria);
 
-
-            $produtoModel->orderBy("nome");
-            $produtos = $produtoModel->paginate($limit);
+            $produtos = $produtoModel
+            ->when($filter_valor, fn(Builder $builder) => $builder->like("valor", $filter_valor))
+            ->when($filter_nome, fn(Builder $builder) => $builder->like("nome", $filter_nome))
+            ->when($filter_stock, fn(Builder $builder) => $builder->where("stock >=", $filter_stock))
+            ->when($filter_categoria, fn(Builder $builder) => $builder->like("categoria", $filter_categoria))
+            ->orderBy("nome")
+            ->asArray()
+            ->findAll($limit, $page);
 
             $results = Paginator::paginate("produtos", $produtos, $page, $limit, site_url("/api/v1/produtos"));
 

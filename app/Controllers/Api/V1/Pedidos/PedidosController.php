@@ -7,6 +7,7 @@ use App\Models;
 use App\Entities;
 use App\Helpers\MapResponse;
 use App\Helpers\Paginator;
+use CodeIgniter\Database\MySQLi\Builder;
 use CodeIgniter\HTTP\Response;
 use CodeIgniter\I18n\Time;
 use Exception;
@@ -19,12 +20,12 @@ class PedidosController extends BaseController
     {
         $rules = [
             "parametros.filter_cliente_nome" => 'if_exist|string',
-            "parametros.filter_cliente_cpnj" => 'if_exist|string',
+            "parametros.filter_cliente_cnpj" => 'if_exist|string',
             "parametros.filter_produto_nome" => 'if_exist|string',
             "parametros.filter_produto_valor" => 'if_exist|string',
             "parametros.filter_produto_stock" => 'if_exist|integer',
             "parametros.filter_produto_categoria" => 'if_exist|string',
-            "parametros.filter_pedido_status" => 'if_exist|integer',
+            "parametros.filter_pedido_status.*" => 'if_exist|max_length[3]|integer|in_list[1,2,3]',
             "page" => "if_exist|integer"
         ];
 
@@ -43,7 +44,7 @@ class PedidosController extends BaseController
             ;
 
             $params = $this->validator->getValidated();
-            $filter_cliente_cpnj = $params["parametros"]["filter_cliente_cpnj"] ?? null;
+            $filter_cliente_cnpj = $params["parametros"]["filter_cliente_cnpj"] ?? null;
             $filter_cliente_nome = $params["parametros"]["filter_cliente_nome"] ?? null;
             $filter_produto_nome = $params["parametros"]["filter_produto_nome"] ?? null;
             $filter_produto_valor = $params["parametros"]["filter_produto_valor"] ?? null;
@@ -78,10 +79,18 @@ class PedidosController extends BaseController
             ->join("clientes", "pedidos.cliente_id = clientes.id and clientes.deleted_at is null")
             ->join("pedido_produto as pp", "pp.pedido_id = pedidos.id", "left")
             ->join("produtos", "produtos.id = pp.produto_id", "left")
+            ->when($filter_cliente_nome, fn(Builder $builder) => $builder->like('clientes.nome', $filter_cliente_nome))
+            ->when($filter_cliente_cnpj, fn(Builder $builder) => $builder->like('clientes.cnpj', $filter_cliente_cnpj))
+            ->when($filter_produto_nome, fn(Builder $builder) => $builder->like('produtos.nome', $filter_produto_nome))
+            ->when($filter_produto_valor, fn(Builder $builder) => $builder->like('produtos.valor', $filter_produto_valor))
+            ->when($filter_produto_stock, fn(Builder $builder) => $builder->where('produtos.stock >=', $filter_produto_stock))
+            ->when($filter_produto_categoria, fn(Builder $builder) => $builder->like('produtos.categoria', $filter_produto_categoria))
+            ->when($filter_pedido_status, fn(Builder $builder) => $builder->whereIn('pedidos.status', $filter_pedido_status))
+
             ->groupBy("pedidos.id")
             ->asArray()
             ->orderBy('pedidos.created_at','desc')
-            ->paginate($limit);
+            ->findAll($limit, $page);
 
 
             $pedidos = array_map(fn($pedido) => $this->mapPedidoDto($pedido), $results);
@@ -90,7 +99,7 @@ class PedidosController extends BaseController
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $results);
 
-            return $this->response->setJSON($response);
+            return $this->response->setJSON($response, true);
         } catch (\Exception $e) {
             /** Maps Error */
             $response = MapResponse::getJsonResponse(
@@ -221,10 +230,12 @@ class PedidosController extends BaseController
     {
         $rules =
             [
-                'parametros.produtos.*' => 'if_exist|max_length[10]',
+                'parametros.produtos.*' => 'if_exist|max_length[10]|integer',
                 'parametros.cliente_id' => 'if_exist|integer'
             ];
 
+        $db = db_connect();
+        $db->transBegin();
         try {
             /** Validate form data */
             if (!$this->validate($rules)) {
@@ -250,12 +261,17 @@ class PedidosController extends BaseController
             $up = [];
 
             if ($cliente_id) {
-                $this->clienteExists($cliente_id, $clienteModel);
+                if ($err = $this->clienteExists($cliente_id, $clienteModel)) {
+                    return $err;
+                }
                 $up['cliente_id'] = $cliente_id;
             }
 
             if ($produtos) {
                 $this->produtosExists($produtos, $produtoModel);
+                if ($err = $this->produtosExists($produtos, $produtoModel)) {
+                    return $err;
+                }
                 $data_entrega = $this->getDataEntrega($produtos, $produtoModel);
                 $up['data_entrega'] = $data_entrega;
                 $ppInserts = [];
@@ -268,17 +284,18 @@ class PedidosController extends BaseController
 
                 $pedidoProdutoModel->where('pedido_id', $id)->delete();
                 $pedidoProdutoModel->insertBatch($ppInserts, 1000);
-
             }
 
-
-            $pedidosModel->where('id', $id)->update($up);
+            $pedidosModel->where('id', $id)->set($up)->update();
 
             $pedido = $this->getPedidoInfo($id, $pedidosModel);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $pedido);
+            
+            $db->transCommit();
             return $this->response->setJSON($response);
         } catch (Exception $e) {
+            $db->transRollback();
             /** Maps Error */
             $response = MapResponse::getJsonResponse(
                 Response::HTTP_BAD_REQUEST,
@@ -315,7 +332,7 @@ class PedidosController extends BaseController
         }
     }
 
-    private function getPedidoInfo(int $id, Models\Pedido $model, array $params = [])
+    private function getPedidoInfo(int $id, Models\Pedido $model)
     {
 
         $results = $model

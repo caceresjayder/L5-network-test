@@ -5,6 +5,7 @@ namespace App\Controllers\Api\V1\Clientes;
 use App\Controllers\BaseController;
 use App\Helpers\MapResponse;
 use App\Helpers\Paginator;
+use CodeIgniter\Database\MySQLi\Builder;
 use CodeIgniter\HTTP\Response;
 use CodeIgniter\HTTP\ResponseInterface;
 use Exception;
@@ -14,7 +15,7 @@ class ClientesController extends BaseController
     public function index()
     {
         $rules = [
-            "parametros.filter_cpnj" => 'if_exist|string',
+            "parametros.filter_cnpj" => 'if_exist|string',
             "parametros.filter_nome" => 'if_exist|string',
             "page" => "if_exist|integer"
         ];
@@ -34,19 +35,19 @@ class ClientesController extends BaseController
             ;
 
             $params = $this->validator->getValidated();
-            $filter_cpnj = $params["parametros"]["filter_cpnj"] ?? null;
+            $filter_cnpj = $params["parametros"]["filter_cnpj"] ?? null;
             $filter_nome = $params["parametros"]["filter_nome"] ?? null;
-            $page = $params["paramentros"]["page"] ?? 0;
+            $page = $params["page"] ?? 0;
             $limit = 15;
 
             $clienteModel = new \App\Models\Cliente();
-            if ($filter_cpnj)
-                $clienteModel->like("cpnj", $filter_cpnj);
-            if ($filter_nome)
-                $clienteModel->like("nome", $filter_nome);
-
-            $clienteModel->orderBy("nome");
-            $clientes = $clienteModel->paginate($limit);
+            
+            $clientes = $clienteModel
+            ->when($filter_cnpj, fn($query) => $query->like("cnpj", $filter_cnpj))
+            ->when($filter_nome, fn(Builder $query) => $query->like("nome", $filter_nome))
+            ->orderBy("nome")
+            ->asArray()
+            ->findAll($limit, $page);
 
             $results = Paginator::paginate("clientes", $clientes, $page, $limit, site_url("/api/v1/clientes"));
 

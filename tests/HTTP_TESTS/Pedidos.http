@@ -3,7 +3,7 @@
 
 ### LIST
 
-GET {{baseurl}}/v1/pedidos
+GET {{baseurl}}/v1/pedidos?parametros[filter_cliente_nome]=
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -29,15 +29,15 @@ Authorization: Bearer {{token}}
 
 ### UPDATE
 
-PUT {{baseurl}}/v1/pedidos/1
+PUT {{baseurl}}/v1/pedidos/5
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
     "parametros" : {
-        "cliente_id" : 1,
-        "produtos" : [6,1,7,5,2],
+        "cliente_id" : 19,
+        "produtos" : [2]
     }
 }
 
@@ -45,3 +45,5 @@ Authorization: Bearer {{token}}
 
 DELETE {{baseurl}}/v1/pedidos/1
 Accept: application/json
+Authorization: Bearer {{token}}
+

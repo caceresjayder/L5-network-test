@@ -17,7 +17,8 @@ class CreateClientesTable extends Migration
             ],
             "user_id" => [
                 "type" => "INT",
-                "unsigned" => true
+                "unsigned" => true,
+                'null' => true,
             ],
             "nome" => [
                 "type" => "VARCHAR",

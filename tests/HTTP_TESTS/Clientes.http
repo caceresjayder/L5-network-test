@@ -3,7 +3,7 @@
 
 ### LIST
 
-GET {{baseurl}}/v1/clientes
+GET {{baseurl}}/v1/clientes  ###?page=0&parametros[filter_cnpj]=888&parametros[filter_nome]=alef
 Accept: application/json
 Authorization: Bearer {{token}}
 

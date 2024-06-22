@@ -3,7 +3,7 @@
 
 ### LIST
 
-GET {{baseurl}}/v1/produtos
+GET {{baseurl}}/v1/produtos ###?page=2&parametros[filter_nome]=ad&parametros[filter_categoria]=quos&parametros[filter_stock]=350&parametros[filter_valor]=855
 Accept: application/json
 Authorization: Bearer {{token}}
 

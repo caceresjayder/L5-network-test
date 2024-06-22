@@ -9,7 +9,7 @@ class Cliente extends Model
     protected $table            = 'clientes';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = \App\Models\Cliente::class;
+    protected $returnType       = \App\Entities\Cliente::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = ["nome", "cnpj", "user_id"];
