@@ -1,8 +1,47 @@
 @token = {{$dotenv %JWT_TOKEN}}
 @baseurl =  {{$dotenv %BACKEND_URL}}
 
-### LIST 
-### SHOW  
-### CREATE 
+### LIST
+
+GET {{baseurl}}/v1/pedidos
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### SHOW
+
+GET {{baseurl}}/v1/pedidos/21
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### CREATE
+
+POST {{baseurl}}/v1/pedidos
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "parametros" : {
+        "cliente_id" : 1,
+        "produtos" : [1,2,3,4,5],
+    }
+}
+
 ### UPDATE
+
+PUT {{baseurl}}/v1/pedidos/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "parametros" : {
+        "cliente_id" : 1,
+        "produtos" : [6,1,7,5,2],
+    }
+}
+
 ### DELETE
+
+DELETE {{baseurl}}/v1/pedidos/1
+Accept: application/json
