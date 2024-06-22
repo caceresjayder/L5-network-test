@@ -31,6 +31,10 @@ class CreateProdutosTable extends Migration
                 "type" => "VARCHAR",
                 "constraint" => "255"
             ],
+            "dias_entrega" => [
+                "type" => "INT",
+                "unsigned" => true
+            ],
             "created_at" => [
                 "type" => "timestamp",
                 "default" => new RawSql("CURRENT_TIMESTAMP")
