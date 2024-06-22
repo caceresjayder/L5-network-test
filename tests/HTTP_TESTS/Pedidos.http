@@ -9,7 +9,7 @@ Authorization: Bearer {{token}}
 
 ### SHOW
 
-GET {{baseurl}}/v1/pedidos/21
+GET {{baseurl}}/v1/pedidos/1
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -22,8 +22,8 @@ Authorization: Bearer {{token}}
 
 {
     "parametros" : {
-        "cliente_id" : 1,
-        "produtos" : [1,2,3,4,5],
+        "cliente_id" : 19,
+        "produtos" : [2,3]
     }
 }
 

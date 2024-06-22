@@ -11,7 +11,7 @@ class Pedido extends Entity
         "codigo_pedido" => null,
         "cliente_id" => null,
         "data_entrega" => null,
-        "status" => null,
+        "status" => 1,
         "created_at" => null,
         "updated_at"=> null,
         "deleted_at" => null,

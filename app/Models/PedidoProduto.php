@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class PedidoProduto extends Model
 {
-    protected $table            = 'pedidoprodutos';
+    protected $table            = 'pedido_produto';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['pedido_id', 'produto_id'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

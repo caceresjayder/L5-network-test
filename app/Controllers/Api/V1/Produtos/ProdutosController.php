@@ -181,7 +181,7 @@ class ProdutosController extends BaseController
             $data = $params['parametros'];
 
             $produtoModel = new \App\Models\Produto();
-            $produtoModel->where('id', $id)->update($data);
+            $produtoModel->where('id', $id)->set($data)->update();
             $produto = $produtoModel->asArray()->find($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $produto);
@@ -204,7 +204,7 @@ class ProdutosController extends BaseController
     {
         try {
             $produtoModel = new \App\Models\Produto();
-            $produtoModel->where('id', $id)->delete();
+            $produtoModel->delete($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK);
             return $this->response->setJSON($response);

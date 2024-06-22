@@ -10,7 +10,7 @@ class Paginator {
         return [
             "$key" => $models,
             "links" => [
-                "prev" => "$url?page=$prevPage",
+                "prev" => $page === 0 ? null :"$url?page=$prevPage",
                 "next" => $nextPage !== null ? "$url?page=$nextPage" : null,
             ]
         ];

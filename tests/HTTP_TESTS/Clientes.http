@@ -45,3 +45,4 @@ Authorization: Bearer {{token}}
 
 DELETE {{baseurl}}/v1/clientes/1
 Accept: application/json
+Authorization: Bearer {{token}}

@@ -27,14 +27,14 @@ $routes->group('api', function (RouteCollection $routes) {
         $routes->get('clientes/(:num)', [Api\V1\Clientes\ClientesController::class, 'show']);
         $routes->post('clientes', [Api\V1\Clientes\ClientesController::class, 'create']);
         $routes->put('clientes/(:num)', [Api\V1\Clientes\ClientesController::class, 'update']);
-        $routes->delete('clientes/(:num)', [Api\V1\Clientes\ClientesController::class, 'destroy']);
+        $routes->delete('clientes/(:num)', [Api\V1\Clientes\ClientesController::class, 'delete']);
 
         /** Produtos */
         $routes->get('produtos', [Api\V1\Produtos\ProdutosController::class, 'index']);
         $routes->get('produtos/(:num)', [Api\V1\Produtos\ProdutosController::class, 'show']);
         $routes->post('produtos', [Api\V1\Produtos\ProdutosController::class, 'create']);
         $routes->put('produtos/(:num)', [Api\V1\Produtos\ProdutosController::class, 'update']);
-        $routes->delete('produtos/(:num)', [Api\V1\Produtos\ProdutosController::class, 'destroy']);
+        $routes->delete('produtos/(:num)', [Api\V1\Produtos\ProdutosController::class, 'delete']);
 
 
         /** Pedidos */
@@ -42,7 +42,7 @@ $routes->group('api', function (RouteCollection $routes) {
         $routes->get('pedidos/(:num)', [Api\V1\Pedidos\PedidosController::class, 'show']);
         $routes->post('pedidos', [Api\V1\Pedidos\PedidosController::class, 'create']);
         $routes->put('pedidos/(:num)', [Api\V1\Pedidos\PedidosController::class, 'update']);
-        $routes->delete('pedidos/(:num)', [Api\V1\Pedidos\PedidosController::class, 'destroy']);
+        $routes->delete('pedidos/(:num)', [Api\V1\Pedidos\PedidosController::class, 'delete']);
     });
 });
 

@@ -29,8 +29,8 @@ class AuthTokenFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if (!$request->hasHeader('authorization')) {
-            $response = MapResponse::getJsonResponse(Response::HTTP_UNAUTHORIZED, "Bearer token not present");
-            return response()->setJSON($response);
+            $response = MapResponse::getJsonResponse(Response::HTTP_UNAUTHORIZED);
+            return response()->setStatusCode(Response::HTTP_UNAUTHORIZED)->setJSON($response);
         };
 
         try {
@@ -49,7 +49,7 @@ class AuthTokenFilter implements FilterInterface
             return $request;
 
         } catch (\Exception $e) {
-            $response = MapResponse::getJsonResponse(Response::HTTP_UNAUTHORIZED, "Invalid bearer token");
+            $response = MapResponse::getJsonResponse(Response::HTTP_UNAUTHORIZED);
             return response()->setStatusCode(Response::HTTP_UNAUTHORIZED)->setJSON($response);
         }
     }

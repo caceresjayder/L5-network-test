@@ -6,13 +6,17 @@ use CodeIgniter\Model;
 
 class Pedido extends Model
 {
+    public const STATUS_EM_ANDAMENTO = 1;
+    public const STATUS_PAGO = 2;
+    public const STATUS_CANCELADO = 3;
+
     protected $table            = 'pedidos';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = \App\Models\Pedido::class;
+    protected $returnType       = \App\Entities\Pedido::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['cliente_id', 'data_entrega', 'codigo_pedido', 'status'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -31,8 +35,8 @@ class Pedido extends Model
     protected $validationRules      = [
         "codigo_pedido" => "required|string",
         "cliente_id" => "required|integer",
-        "data_entrega" => "required|date_format[Y-m-d H:i:s]",
-        "status" => "required|in[1,2,3]"
+        "data_entrega" => "required|valid_date[Y-m-d H:i:s]",
+        "status" => "required|in_list[1,2,3]"
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;

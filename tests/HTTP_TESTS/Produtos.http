@@ -22,10 +22,10 @@ Authorization: Bearer {{token}}
 
 {
     "parametros" : {
-        "nome" : "Produto 1",
-        "valor" : "100.00",
-        "stock" : 1,
-        "categoria" : "home"
+        "nome" : "Produto 3",
+        "valor" : "644.00",
+        "stock" : 10,
+        "categoria" : "construction"
     }
 }
 
@@ -49,3 +49,4 @@ Authorization: Bearer {{token}}
 
 DELETE {{baseurl}}/v1/produtos/1
 Accept: application/json
+Authorization: Bearer {{token}}
