@@ -1,0 +1,8 @@
+@token = {{$dotenv %JWT_TOKEN}}
+@baseurl =  {{$dotenv %BACKEND_URL}}
+
+### LIST 
+### SHOW  
+### CREATE 
+### UPDATE
+### DELETE

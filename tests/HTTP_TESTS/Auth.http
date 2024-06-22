@@ -1,7 +1,9 @@
+@baseurl = {{$dotenv %BACKEND_URL}}
+@token = {{$dotenv %JWT_TOKEN}}
 
 ### REGISTER
 
-POST {{$dotenv %BACKEND_URL}}/auth/register
+POST {{baseurl}}/auth/register
 Accept: application/json
 Content-Type: application/json
 
@@ -15,7 +17,7 @@ Content-Type: application/json
 }
 
 ### LOGIN
-POST {{$dotenv %BACKEND_URL}}/auth/login
+POST {{baseurl}}/auth/login
 Accept: application/json
 Content-Type: application/json
 
@@ -28,6 +30,6 @@ Content-Type: application/json
 
 ### USER INFO
 
-GET {{$dotenv %BACKEND_URL}}/auth/user-info
+GET {{baseurl}}/auth/user-info
 Accept: application/json
-Authorization: Bearer {{$dotenv %JWT_TOKEN}}
+Authorization: Bearer {{token}}

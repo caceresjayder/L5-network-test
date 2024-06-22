@@ -1,0 +1,51 @@
+@token = {{$dotenv %JWT_TOKEN}}
+@baseurl =  {{$dotenv %BACKEND_URL}}
+
+### LIST
+
+GET {{baseurl}}/v1/produtos
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### SHOW
+
+GET {{baseurl}}/v1/produtos/21
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### CREATE
+
+POST {{baseurl}}/v1/produtos
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "parametros" : {
+        "nome" : "Produto 1",
+        "valor" : "100.00",
+        "stock" : 1,
+        "categoria" : "home"
+    }
+}
+
+### UPDATE
+
+PUT {{baseurl}}/v1/produtos/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "parametros" : {
+        "nome" : "Produto updated",
+        "valor" : "110.00",
+        "stock" : 12,
+        "categoria" : "beach"
+    }
+}
+
+### DELETE
+
+DELETE {{baseurl}}/v1/produtos/1
+Accept: application/json
