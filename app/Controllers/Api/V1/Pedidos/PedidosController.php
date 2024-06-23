@@ -76,7 +76,7 @@ class PedidosController extends BaseController
                     then 'Cancelado'
                     else null
                     end) as status_nome",
-                /** JSON APPROACH MYSQL ^5.7 */
+                /** JSON APPROACH MYSQL ^8 */
                 "JSON_ARRAYAGG(JSON_OBJECT('id', produtos.id, 'nome', produtos.nome)) as produtos"
             ])
             ->selectCount("produtos.id", "qtd_produtos")
