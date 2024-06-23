@@ -2,11 +2,16 @@
 
 Requirements
 
-- PHP ^8.1
-- Codeigniter ^4.5
-- Mysql ^8
-- Composer ^2.7
+-PHP ^8.1
+-Codeigniter ^4.5
+-Mysql ^8
+-Composer ^2.7
 
+### Clone repository
+
+```
+git clone https://github.com/caceresjayder/L5-network-test.git
+```
 
 ### Install dependencies
 
@@ -22,7 +27,7 @@ php spark key:generate
 
 ### Sets enviroment
 
-.env.example file
+-.env.example file
 -Jwt secret
 -Jwt expiration
 -Database connection
@@ -45,17 +50,17 @@ php spark db:seed SeederDB
 
 ### Testes foram feitos usando http templates
 Recomendavel instalar Rest Client de HUACHAO no vscode
-Os archivos rest de teste estão na pasta tests > HTTP_TESTS
+\n Os archivos rest de teste estão na pasta tests > HTTP_TESTS
 
-Reference 
-Name: REST Client
-Id: humao.rest-client
-Description: REST Client for Visual Studio Code
-Version: 0.25.1
-Publisher: Huachao Mao
-VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+\n Reference 
+\n Name: REST Client
+\n Id: humao.rest-client
+\n Description: REST Client for Visual Studio Code
+\n Version: 0.25.1
+\n Publisher: Huachao Mao
+\n VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
 
 Dentro da pasta tests > HTTP_TESTS está um arquivo .env que são as variaveis de ambiente do próprio REST CLIENT
 
-Usar o endpoint de registro para registrar um usuario com o qual depois pode fazer login recebe um JWT TOKEN para fazer as requisições protegidas.
+\n Usar o endpoint de registro para registrar um usuario com o qual depois pode fazer login recebe um JWT TOKEN para fazer as requisições protegidas.
