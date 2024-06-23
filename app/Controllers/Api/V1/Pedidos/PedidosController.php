@@ -41,8 +41,8 @@ class PedidosController extends BaseController
                         )
                     );
             }
-            ;
 
+            /** Gets validated data */
             $params = $this->validator->getValidated();
             $filter_cliente_cnpj = $params["parametros"]["filter_cliente_cnpj"] ?? null;
             $filter_cliente_nome = $params["parametros"]["filter_cliente_nome"] ?? null;
@@ -54,8 +54,11 @@ class PedidosController extends BaseController
             $page = $params["page"] ?? 0;
             $limit = 15;
 
+            /** Inits pedido model */
             $pedidoModel = new Models\Pedido();
 
+
+            /** Gets rows from pedidos and related data */
             $results = $pedidoModel
             ->select([
                 "pedidos.id", 
@@ -73,12 +76,16 @@ class PedidosController extends BaseController
                     then 'Cancelado'
                     else null
                     end) as status_nome",
+                /** JSON APPROACH MYSQL ^5.7 */
                 "JSON_ARRAYAGG(JSON_OBJECT('id', produtos.id, 'nome', produtos.nome)) as produtos"
             ])
             ->selectCount("produtos.id", "qtd_produtos")
             ->join("clientes", "pedidos.cliente_id = clientes.id and clientes.deleted_at is null")
             ->join("pedido_produto as pp", "pp.pedido_id = pedidos.id", "left")
             ->join("produtos", "produtos.id = pp.produto_id", "left")
+            
+            /** Filters */
+            
             ->when($filter_cliente_nome, fn(Builder $builder) => $builder->like('clientes.nome', $filter_cliente_nome))
             ->when($filter_cliente_cnpj, fn(Builder $builder) => $builder->like('clientes.cnpj', $filter_cliente_cnpj))
             ->when($filter_produto_nome, fn(Builder $builder) => $builder->like('produtos.nome', $filter_produto_nome))
@@ -93,10 +100,13 @@ class PedidosController extends BaseController
             ->findAll($limit, $page);
 
 
+            /** Maps data */
             $pedidos = array_map(fn($pedido) => $this->mapPedidoDto($pedido), $results);
 
+            /** Paginate */
             $results = Paginator::paginate("pedidos", $pedidos, $page, $limit, site_url("/api/v1/pedidos"));
 
+            /** Response */
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $results);
 
             return $this->response->setJSON($response, true);
@@ -119,8 +129,10 @@ class PedidosController extends BaseController
     {
         try {
 
+            /** Inits pedido model */
             $pedidoModel = new Models\Pedido();
 
+            /** Get Pedido by id */
             $pedido = $this->getPedidoInfo($id, $pedidoModel);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $pedido);
@@ -164,23 +176,28 @@ class PedidosController extends BaseController
                     );
             }
 
+            /** Gets validated data */
             $params = $this->validator->getValidated();
             $produtos = $params['parametros']['produtos'];
             $cliente_id = $params['parametros']['cliente_id'];
 
+            /** Inits models and entities */
             $clienteModel = new Models\Cliente();
             $produtoModel = new Models\Produto();
             $pedidosModel = new Models\Pedido();
             $pedidoProdutoModel = new Models\PedidoProduto();
 
+            /** Verifies if cliente exists */
             if ($err = $this->clienteExists($cliente_id, $clienteModel)) {
                 return $err;
             }
 
+            /** Verifies if all produtos exists */
             if ($err = $this->produtosExists($produtos, $produtoModel)) {
                 return $err;
             }
 
+            /** Gets data entrega */
             $data_entrega = $this->getDataEntrega($produtos, $produtoModel);
 
             $pedido = new Entities\Pedido([
@@ -190,9 +207,11 @@ class PedidosController extends BaseController
                 'codigo_pedido' => md5(now())
             ]);
 
+            /** Saves pedido */
             $pedidosModel->save($pedido);
             $pedidoId = $pedidosModel->getInsertID();
 
+            /** Maps producto - pedido relationships and saves it */
             $ppInserts = [];
             foreach ($produtos as $produto) {
                 $ppInserts[] = [
@@ -202,6 +221,8 @@ class PedidosController extends BaseController
             }
 
             $pedidoProdutoModel->insertBatch($ppInserts, 1000);
+
+            /** Retrieve pedido */
             if(!$pedido = $this->getPedidoInfo($pedidoId, $pedidosModel)){
                 throw new Exception("Resource not created");
             };
@@ -209,9 +230,12 @@ class PedidosController extends BaseController
             
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $pedido);
             
+            /** All good, commits transaction */
             $db->transCommit();
             return $this->response->setJSON($response);
         } catch (Exception $e) {
+
+            /** Wrong! rollback db changes */
             $db->transRollback();
             /** Maps Error */
             $response = MapResponse::getJsonResponse(
@@ -249,10 +273,12 @@ class PedidosController extends BaseController
                     );
             }
 
+            /** Gets validated data */
             $params = $this->validator->getValidated();
             $produtos = $params['parametros']['produtos'] ?? null;
             $cliente_id = $params['parametros']['cliente_id'] ?? null;
 
+            /** Init models and entities */
             $clienteModel = new Models\Cliente();
             $produtoModel = new Models\Produto();
             $pedidosModel = new Models\Pedido();
@@ -260,6 +286,7 @@ class PedidosController extends BaseController
 
             $up = [];
 
+            /** If changes cliente then veirify if exist and prepare for update */
             if ($cliente_id) {
                 if ($err = $this->clienteExists($cliente_id, $clienteModel)) {
                     return $err;
@@ -267,6 +294,7 @@ class PedidosController extends BaseController
                 $up['cliente_id'] = $cliente_id;
             }
 
+            /** If changes produtos then verify if exists all products and prepare for update */
             if ($produtos) {
                 $this->produtosExists($produtos, $produtoModel);
                 if ($err = $this->produtosExists($produtos, $produtoModel)) {
@@ -282,19 +310,25 @@ class PedidosController extends BaseController
                     ];
                 }
 
+                /** Sync relations */
                 $pedidoProdutoModel->where('pedido_id', $id)->delete();
                 $pedidoProdutoModel->insertBatch($ppInserts, 1000);
             }
 
+            /** Updates pedido */
             $pedidosModel->where('id', $id)->set($up)->update();
 
+            /** Retrieves pedido */
             $pedido = $this->getPedidoInfo($id, $pedidosModel);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $pedido);
             
+            /** All good, commits changes */
             $db->transCommit();
             return $this->response->setJSON($response);
         } catch (Exception $e) {
+
+            /** Wrong! rollback db changes */
             $db->transRollback();
             /** Maps Error */
             $response = MapResponse::getJsonResponse(
@@ -313,6 +347,7 @@ class PedidosController extends BaseController
     {
         try {
 
+            /** Deletes registry */
             $pedidoModel = new Models\Pedido();
             $pedidoModel->where('id', $id)->delete();
 
@@ -335,6 +370,7 @@ class PedidosController extends BaseController
     private function getPedidoInfo(int $id, Models\Pedido $model)
     {
 
+        /** Get row from pedidos and it's relations */
         $results = $model
         ->select([
             "pedidos.id", 
@@ -368,6 +404,7 @@ class PedidosController extends BaseController
 
     private function getDataEntrega(array $produtos, Models\Produto $model)
     {
+        /** Retrieves higher day from product and returns a date for delivery reference */
         $res = $model
             ->select('dias_entrega')
             ->whereIn('id', $produtos)
@@ -380,6 +417,7 @@ class PedidosController extends BaseController
 
     private function clienteExists(int $id, Models\Cliente $model)
     {
+        /** Verifies if cliente exist */
         if (!$cliente = $model->select('id')->find($id)) {
             $response = MapResponse::getJsonResponse(Response::HTTP_NOT_FOUND);
             return $this->response->setStatusCode(Response::HTTP_NOT_FOUND)->setJSON($response);
@@ -390,6 +428,7 @@ class PedidosController extends BaseController
 
     private function produtosExists(array $produtos, Models\Produto $model)
     {
+        /** Verifies if all products exist */
         if (
             !($model->select('id')
                 ->where('stock >', 0)
@@ -405,6 +444,7 @@ class PedidosController extends BaseController
 
     private function mapPedidoDto(array $pedido)
     {
+        /** Maps pedido */
         return [
             'id' => $pedido['id'],
             'codigo_pedido' => $pedido['codigo_pedido'],

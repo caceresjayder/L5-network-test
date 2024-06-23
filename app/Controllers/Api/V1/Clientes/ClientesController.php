@@ -32,9 +32,11 @@ class ClientesController extends BaseController
                             )
                     );
             }
-            ;
 
+            /** Gets validated data */
             $params = $this->validator->getValidated();
+
+            /** Takes filters */
             $filter_cnpj = $params["parametros"]["filter_cnpj"] ?? null;
             $filter_nome = $params["parametros"]["filter_nome"] ?? null;
             $page = $params["page"] ?? 0;
@@ -42,6 +44,7 @@ class ClientesController extends BaseController
 
             $clienteModel = new \App\Models\Cliente();
             
+            /** Gets rows from clientes database */
             $clientes = $clienteModel
             ->when($filter_cnpj, fn($query) => $query->like("cnpj", $filter_cnpj))
             ->when($filter_nome, fn(Builder $query) => $query->like("nome", $filter_nome))
@@ -49,6 +52,7 @@ class ClientesController extends BaseController
             ->asArray()
             ->findAll($limit, $page);
 
+            /** Paginate results */
             $results = Paginator::paginate("clientes", $clientes, $page, $limit, site_url("/api/v1/clientes"));
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $results);
@@ -73,8 +77,11 @@ class ClientesController extends BaseController
     {
         try {
 
+            /** Retrieves cliente */
             $clienteModel = new \App\Models\Cliente();
             $cliente = $clienteModel->asArray()->find($id);
+
+            /** Cliente exists */
             if (!$cliente) {
                 $response = MapResponse::getJsonResponse(Response::HTTP_NOT_FOUND);
                 return $this->response->setStatusCode(Response::HTTP_NOT_FOUND)->setJSON($response);
@@ -120,14 +127,19 @@ class ClientesController extends BaseController
                     );
             }
 
+            /** Gets data */
             $params = $this->validator->getValidated();
             $data = $params['parametros'];
 
+            /** Init models and cliente instance */
             $clienteModel = new \App\Models\Cliente();
             $cliente = new \App\Entities\Cliente($data);
 
+            /** Saves entity */
             $clienteModel->save($cliente);
             $id = $clienteModel->getInsertID();
+
+            /** Retrieves the cliente by id */
             $cliente = $clienteModel->asArray()->find($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $cliente);
@@ -170,11 +182,17 @@ class ClientesController extends BaseController
                     );
             }
 
+            /** Gets data */
             $params = $this->validator->getValidated();
             $data = $params['parametros'];
 
+            /** Init clientes model */
             $clienteModel = new \App\Models\Cliente();
+
+            /** Updates cliente */
             $clienteModel->where('id', $id)->update($data);
+
+            /** Retrieve clientes information */
             $cliente = $clienteModel->asArray()->find($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $cliente);
@@ -199,7 +217,10 @@ class ClientesController extends BaseController
     {
         try
         {
+            /** Inits clientes model */
             $clienteModel = new \App\Models\Cliente();
+
+            /** Deletes cliente by id */
             $clienteModel->where('id', $id)->delete();
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK);

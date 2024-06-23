@@ -34,7 +34,11 @@ class ProdutosController extends BaseController
                     );
             }
 
+
+            /** Gets validated params */
             $params = $this->validator->getValidated();
+
+            /**  */
             $filter_valor = $params["parametros"]["filter_valor"] ?? null;
             $filter_nome = $params["parametros"]["filter_nome"] ?? null;
             $filter_stock = $params["parametros"]["filter_stock"] ?? null;
@@ -42,8 +46,10 @@ class ProdutosController extends BaseController
             $page = $params["page"] ?? 0;
             $limit = 15;
 
+            /** Init produto model */
             $produtoModel = new \App\Models\Produto();
 
+            /** Get rows from produtos */
             $produtos = $produtoModel
             ->when($filter_valor, fn(Builder $builder) => $builder->like("valor", $filter_valor))
             ->when($filter_nome, fn(Builder $builder) => $builder->like("nome", $filter_nome))
@@ -53,6 +59,7 @@ class ProdutosController extends BaseController
             ->asArray()
             ->findAll($limit, $page);
 
+            /** Paginate */
             $results = Paginator::paginate("produtos", $produtos, $page, $limit, site_url("/api/v1/produtos"));
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $results);
@@ -77,8 +84,13 @@ class ProdutosController extends BaseController
     {
         try {
 
+            /** Init produto model */
             $produtoModel = new \App\Models\Produto();
+
+            /** retrieve produto by id */
             $produto = $produtoModel->asArray()->find($id);
+
+            /** Produto exists */
             if (!$produto) {
                 $response = MapResponse::getJsonResponse(Response::HTTP_NOT_FOUND);
                 return $this->response->setStatusCode(Response::HTTP_NOT_FOUND)->setJSON($response);
@@ -125,14 +137,19 @@ class ProdutosController extends BaseController
                     );
             }
 
+            /** Gets validated data */
             $params = $this->validator->getValidated();
             $data = $params['parametros'];
 
+            /** Inits produto model and entity */
             $produtoModel = new \App\Models\Produto();
             $produto = new \App\Entities\Produto($data);
 
+            /** Saves produto entity */
             $produtoModel->save($produto);
             $id = $produtoModel->getInsertID();
+
+            /** Gets created produto by id */
             $produto = $produtoModel->asArray()->find($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $produto);
@@ -174,11 +191,17 @@ class ProdutosController extends BaseController
                     );
             }
 
+            /** Gets validated data */
             $params = $this->validator->getValidated();
             $data = $params['parametros'];
 
+            /** Init produto model */
             $produtoModel = new \App\Models\Produto();
+
+            /** Updates produto */
             $produtoModel->where('id', $id)->set($data)->update();
+
+            /** Retrieves produtos by id */
             $produto = $produtoModel->asArray()->find($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, $produto);
@@ -200,7 +223,11 @@ class ProdutosController extends BaseController
     public function delete(int $id)
     {
         try {
+
+            /** Inits produto model */
             $produtoModel = new \App\Models\Produto();
+
+            /** Deletes produto */
             $produtoModel->delete($id);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK);

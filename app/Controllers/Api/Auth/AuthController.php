@@ -4,15 +4,12 @@ namespace App\Controllers\Api\Auth;
 
 use App\Controllers\BaseController;
 use App\Helpers\MapResponse;
-use CodeIgniter\HTTP\Request;
 use CodeIgniter\HTTP\Response;
-use CodeIgniter\HTTP\ResponseInterface;
 use Exception;
 
 use \App\Models;
 use \App\Entities;
 use App\Helpers\JwtHelper;
-use Throwable;
 
 class AuthController extends BaseController
 {
@@ -136,16 +133,19 @@ class AuthController extends BaseController
             /** @var \App\Entities\User $user */
             $user = $userModel->select("id, password")->where("email", $params['email'])->first();
 
+            /** Verifies if user exists and password match */
             if(!$user || !password_verify($params['password'], $user->password))
             {
                 $response = MapResponse::getJsonResponse(Response::HTTP_UNAUTHORIZED);
                 return $this->response->setStatusCode(Response::HTTP_UNAUTHORIZED)->setJSON($response);
             }
 
+            /** Jwt payload */
             $payload = [
                 'sub' => $user->id
             ];
 
+            /** Jwt Token */
             $token = JwtHelper::generateToken($payload);
 
             $response = MapResponse::getJsonResponse(Response::HTTP_OK, ["token" => $token]);
@@ -167,7 +167,7 @@ class AuthController extends BaseController
         }
     }
 
-    public function logout(){}
+    // public function logout(){}
 
     public function userInfo(){
 
@@ -191,6 +191,7 @@ class AuthController extends BaseController
                     "inner")
                 ->first();
 
+            /** Row exists */
             if(!$registry)
             {
                 $response = MapResponse::getJsonResponse(Response::HTTP_UNAUTHORIZED);
